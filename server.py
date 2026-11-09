@@ -3,7 +3,7 @@
 from socket import *
 import threading
 
-SERVER_PORT = 12000
+SERVER_PORT = 20000
 def handle_client(connection, address):
     print(f"Client connected: {address}")
     while True:
@@ -18,6 +18,7 @@ def handle_client(connection, address):
     print(f"Client disconnected: {address}")
 
 server_socket = socket(AF_INET, SOCK_STREAM)
+server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) # Alex's metode til genbrug af port
 server_socket.bind(("", SERVER_PORT))
 server_socket.listen()
 
