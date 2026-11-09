@@ -14,3 +14,6 @@ while True:
     response = client_socket.recv(1024).decode()
     print("From server:", response)
 client_socket.close()
+
+
+# Mads's kommentar
