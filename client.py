@@ -8,6 +8,8 @@ client_socket.connect((SERVER_NAME, SERVER_PORT))
 while True:
     message = input("Message: ")
     client_socket.send(message.encode())
+    if not message:
+        break
     if message == "STOP":
         break
     modified_message = client_socket.recv(2048)
