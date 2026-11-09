@@ -10,6 +10,6 @@ while True:
     client_socket.send(message.encode())
     if message == "STOP":
         break
-    response = client_socket.recv(1024).decode()
-    print("From server:", response)
+    modified_message = client_socket.recv(2048)
+    print("From server: ", modified_message.decode())
 client_socket.close()

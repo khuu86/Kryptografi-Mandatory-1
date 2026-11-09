@@ -7,7 +7,7 @@ SERVER_PORT = 20000
 def handle_client(connection, address):
     print(f"Client connected: {address}")
     while True:
-        message = connection.recv(1024)
+        message = connection.recv(2048)
         if not message:
             break
         message = message.decode().strip()
