@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from socket import *
 import threading # brug threading for at flere klienter kan sende beskeder på samme tid
 from argon2 import PasswordHasher
