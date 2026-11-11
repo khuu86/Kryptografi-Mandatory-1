@@ -1,22 +1,38 @@
 from socket import *
 import threading # brug threading for at flere klienter kan sende beskeder på samme tid
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
-SECRET = "1234"
-ph = PasswordHasher()
-hash_secret = ph.hash(SECRET)
+password_hasher = PasswordHasher()
 
-def check_hash(input_secret):
-    ph.verify(hash_secret, input_secret)
-    return
+# Genereret midlertidig hash: python3 -c "from argon2 import PasswordHasher; print(PasswordHasher().hash('1234'))" 
+STORED_HASH = "$argon2id$v=19$m=65536,t=3,p=4$o6kmtal9+D+3bjdGgDxS3Q$J0MdpJSo7DAiLRrOSudQCijIOsQGhVaqdNmWDSNLCAo"
+
+def verify_code(code):
+    try:
+        return password_hasher.verify(STORED_HASH, code)
+    except VerifyMismatchError:
+        return False
 
 SERVER_PORT = 20000
 def handle_client(connection, address):
     print(f"Client connected: {address}")
 
-    try:
-        authentication = connection.recv(1024).decode
-    
+    # Login skal ske før chatten starter
+    connection.send(b"Enter code: ")
+
+    code = connection.recv(2048).decode().strip()
+
+    if verify_code(code):
+        connection.send(b"Hash match, you are connected.")
+        print(f"Authentication successful: {address}")
+    else:
+        connection.send(b"Hash mismatch, disconnected.")
+        connection.close()
+        print(f"Authentication failed: {address}")
+        return
+
+    # Chat-loopet starter først efter korrekt login
     while True:
         message = connection.recv(2048)
         if not message:
@@ -34,6 +50,7 @@ server_socket.bind(("", SERVER_PORT))
 server_socket.listen()
 
 print(f"Server listening on port {SERVER_PORT}")
+
 while True:
     connection, address = server_socket.accept()
     thread = threading.Thread(
@@ -41,6 +58,3 @@ while True:
         args=(connection, address)
     )
     thread.start()
-
-# password: 1234
-# KDF-funktion: Argon2id
